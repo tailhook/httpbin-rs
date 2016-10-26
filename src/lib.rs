@@ -6,5 +6,6 @@ extern crate tk_bufstream;
 extern crate minihttp;
 
 mod service;
+mod pages;
 
 pub use service::HttpBin;
