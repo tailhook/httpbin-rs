@@ -11,6 +11,7 @@ pub mod index;
 pub mod not_found;
 pub mod ip;
 pub mod user_agent;
+pub mod headers;
 
 
 fn std_headers<S: Io>(res: &mut ResponseWriter<S>) {

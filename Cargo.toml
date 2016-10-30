@@ -20,7 +20,7 @@ argparse = "0.2.1"
 env_logger = "0.3.5"
 time = "0.1.0"
 log = "0.3.6"
-minihttp = { git="git://github.com/popravich/minihttp", rev="5686e0d" }
+minihttp = { git="git://github.com/popravich/minihttp", rev="7bf2c56" }
 tk-bufstream = "0.1.0"
 tokio-service = { git="https://github.com/tokio-rs/tokio-service", rev="92eccdc" }
 serde_json = "0.8.3"

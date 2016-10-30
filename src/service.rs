@@ -24,6 +24,7 @@ impl<S: Io> Service for HttpBin<S> {
             "/" => pages::index::serve(),
             "/ip" => pages::ip::serve(req.peer_addr),
             "/user-agent" => pages::user_agent::serve(req),
+            "/headers" => pages::headers::serve(req),
             _ => pages::not_found::serve(),
         };
         return finished(serializer)
