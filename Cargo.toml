@@ -1,7 +1,8 @@
 [package]
 name = "httpbin"
 description = """
-    A httpbin reimplementation in rust. Works as a library and a binary.
+    A httpbin reimplementation in rust. Works as a library and as a standalone
+    webserver binary. (not affiliated to the original httpbin)
 """
 license = "MIT/Apache-2.0"
 readme = "README.rst"

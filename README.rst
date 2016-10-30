@@ -9,6 +9,8 @@ This is a reimplementation of httpbin_ for two purposes:
 1. To demonstrate (and test) abilities of a http_ library for rust
 2. To make a static binary providing all the httpbin functionality
 
+(not affiliated to the original httpbin)
+
 
 .. _http: http://github.com/popravich/minihttp
 .. _httpbin: http://httpbin.org
