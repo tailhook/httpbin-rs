@@ -2,27 +2,15 @@ use std::net::SocketAddr;
 use futures::{Finished};
 use tk_bufstream::IoBuf;
 use tokio_core::io::Io;
-use minihttp::{ResponseFn, Error, Status};
+use minihttp::{ResponseFn, Error};
 use serde_json::builder::ObjectBuilder;
-use serde_json::ser::to_string_pretty;
 
-use super::std_headers;
+use super::json_page;
 
 pub fn serve<S: Io>(origin: SocketAddr)
     -> ResponseFn<Finished<IoBuf<S>, Error>, S>
 {
-    ResponseFn::new(move |mut res| {
-        res.status(Status::Ok);
-        res.add_header("Content-Type", "application/json").unwrap();
-        let data = to_string_pretty(
-            &ObjectBuilder::new()
+    json_page(&ObjectBuilder::new()
             .insert("origin", format!("{}", origin.ip()))
-            .build()).unwrap();
-        res.add_length(data.as_bytes().len() as u64).unwrap();
-        std_headers(&mut res);
-        if res.done_headers().unwrap() {
-            res.write_body(data.as_bytes());
-        }
-        res.done()
-    })
+            .build())
 }
