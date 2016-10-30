@@ -6,6 +6,7 @@ use minihttp::ResponseWriter;
 pub mod index;
 pub mod not_found;
 pub mod ip;
+pub mod user_agent;
 
 
 fn std_headers<S: Io>(res: &mut ResponseWriter<S>) {
