@@ -22,6 +22,7 @@ impl<S: Io> Service for HttpBin<S> {
     fn call(&self, req: Self::Request) -> Self::Future {
         let serializer = match &req.path[..] {
             "/" => pages::index::serve(),
+            "/ip" => pages::ip::serve(req.peer_addr),
             _ => pages::not_found::serve(),
         };
         return finished(serializer)
