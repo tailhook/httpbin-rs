@@ -13,6 +13,7 @@ pub mod ip;
 pub mod user_agent;
 pub mod headers;
 pub mod utf8;
+pub mod status;
 
 
 fn std_headers<S: Io>(res: &mut ResponseWriter<S>) {

@@ -1,5 +1,9 @@
-use futures::{Finished, Async, finished};
+use std::str::from_utf8;
 use std::marker::PhantomData;
+use std::path::Path;
+use std::os::unix::prelude::*;
+
+use futures::{Finished, Async, finished};
 use tokio_core::io::Io;
 use tokio_service::Service;
 use tk_bufstream::IoBuf;
@@ -20,12 +24,16 @@ impl<S: Io> Service for HttpBin<S> {
     type Future = Finished<Self::Response, Error>;
 
     fn call(&self, req: Self::Request) -> Self::Future {
-        let serializer = match &req.path[..] {
-            "/" => pages::index::serve(),
-            "/ip" => pages::ip::serve(req.peer_addr),
-            "/user-agent" => pages::user_agent::serve(req),
-            "/headers" => pages::headers::serve(req),
-            "/encoding/utf-8" => pages::utf8::serve(),
+        let mut path = Path::new(&req.path).iter()
+            .map(|x| from_utf8(x.as_bytes()).unwrap());
+        path.next();  // first empty component
+        let serializer = match (path.next().unwrap_or(""), path.next()) {
+            ("", _) => pages::index::serve(),
+            ("ip", None) => pages::ip::serve(req.peer_addr),
+            ("user-agent", None) => pages::user_agent::serve(&req),
+            ("headers", None) => pages::headers::serve(&req),
+            ("encoding", Some("utf-8")) => pages::utf8::serve(),
+            ("status", Some(x)) => pages::status::serve(x),
             _ => pages::not_found::serve(),
         };
         return finished(serializer)

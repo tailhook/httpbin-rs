@@ -6,7 +6,7 @@ use serde_json::builder::ObjectBuilder;
 
 use super::json_page;
 
-pub fn serve<S: Io>(request: Request)
+pub fn serve<S: Io>(request: &Request)
     -> ResponseFn<Finished<IoBuf<S>, Error>, S>
 {
     let ua = request.headers.iter()
