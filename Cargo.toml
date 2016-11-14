@@ -23,7 +23,7 @@ time = "0.1.0"
 log = "0.3.6"
 minihttp = { git="git://github.com/popravich/minihttp", rev="7bf2c56" }
 tk-bufstream = "0.1.0"
-tokio-service = { git="https://github.com/tokio-rs/tokio-service", rev="92eccdc" }
+tokio-service = { git="https://github.com/tokio-rs/tokio-service", rev="da47a93" }
 serde_json = "0.8.3"
 
 [lib]
@@ -33,4 +33,4 @@ name = "httpbin"
 name = "httpbin"
 
 [replace]
-"tokio-service:0.1.0" = { git="https://github.com/tokio-rs/tokio-service", rev="92eccdc" }
+"tokio-service:0.1.0" = { git="https://github.com/tokio-rs/tokio-service", rev="da47a93" }

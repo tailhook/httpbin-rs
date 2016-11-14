@@ -24,7 +24,7 @@ fn main() {
 
     let addr = "0.0.0.0:8080".parse().unwrap();
 
-    minihttp::serve(&lp.handle(), addr, httpbin::HttpBin::new());
+    minihttp::serve(&lp.handle(), addr, || Ok(httpbin::HttpBin::new()));
 
     lp.run(futures::empty::<(), ()>()).unwrap();
 }

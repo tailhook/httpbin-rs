@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use std::path::Path;
 use std::os::unix::prelude::*;
 
-use futures::{Finished, Async, finished};
+use futures::{Finished, finished};
 use tokio_core::io::Io;
 use tokio_service::Service;
 use tk_bufstream::IoBuf;
@@ -37,10 +37,6 @@ impl<S: Io> Service for HttpBin<S> {
             _ => pages::not_found::serve(),
         };
         return finished(serializer)
-    }
-
-    fn poll_ready(&self) -> Async<()> {
-        Async::Ready(())
     }
 }
 
