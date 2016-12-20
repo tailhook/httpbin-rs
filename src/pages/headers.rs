@@ -1,7 +1,7 @@
 use futures::{Finished};
 use tk_bufstream::IoBuf;
 use tokio_core::io::Io;
-use minihttp::{ResponseFn, Error, Request};
+use minihttp::server::{ResponseFn, Error, Request};
 use serde_json::builder::ObjectBuilder;
 
 use super::json_page;

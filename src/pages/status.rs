@@ -2,7 +2,8 @@ use futures::{Finished};
 use std::str::FromStr;
 use tk_bufstream::IoBuf;
 use tokio_core::io::Io;
-use minihttp::{ResponseFn, Error, Status};
+use minihttp::server::{ResponseFn, Error};
+use minihttp::{Status};
 
 use super::std_headers;
 

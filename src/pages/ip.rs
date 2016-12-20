@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 use futures::{Finished};
 use tk_bufstream::IoBuf;
 use tokio_core::io::Io;
-use minihttp::{ResponseFn, Error};
+use minihttp::server::{ResponseFn, Error};
 use serde_json::builder::ObjectBuilder;
 
 use super::json_page;

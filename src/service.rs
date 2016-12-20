@@ -9,8 +9,7 @@ use tokio_service::Service;
 use tk_bufstream::IoBuf;
 
 use pages;
-use minihttp::{ResponseFn, Error};
-use minihttp::request::Request;
+use minihttp::server::{ResponseFn, Error, Request};
 
 pub struct HttpBin<S> {
     p: PhantomData<S>

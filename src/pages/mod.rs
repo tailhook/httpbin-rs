@@ -5,7 +5,8 @@ use serde_json::Value;
 use serde_json::ser::to_string_pretty;
 use tk_bufstream::IoBuf;
 use tokio_core::io::Io;
-use minihttp::{ResponseWriter, ResponseFn, Error, Status};
+use minihttp::server::{ResponseWriter, ResponseFn, Error};
+use minihttp::{Status};
 
 pub mod index;
 pub mod not_found;
