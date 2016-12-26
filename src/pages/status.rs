@@ -1,31 +1,71 @@
-use futures::{Finished};
-use std::str::FromStr;
-use tk_bufstream::IoBuf;
-use tokio_core::io::Io;
-use minihttp::server::{ResponseFn, Error};
-use minihttp::{Status};
+use std::str::{FromStr, from_utf8};
+use std::path::PathBuf;
+use std::sync::Arc;
+use std::os::unix::ffi::OsStrExt;
 
-use super::std_headers;
+use time;
+use tokio_core::io::Io;
+use minihttp::Status;
+use minihttp::server::{Codec, Error, Encoder, RecvMode};
+use futures::{Async};
+use futures::future::{ok};
+
+use pages::{ResponseFuture, Response};
+use service::{Request};
 
 const PAGE: &'static str = include_str!("../templates/custom_status.html");
 
-pub fn serve<S: Io>(status: &str) -> ResponseFn<Finished<IoBuf<S>, Error>, S> {
-    let parsed = u16::from_str(status).ok().and_then(|x| Status::from(x));
+pub struct CustomStatus {
+    status: Status,
+    prefix: Arc<PathBuf>,
+}
+
+impl<S: Io + 'static> Codec<S> for CustomStatus {
+    type ResponseFuture = ResponseFuture<S>;
+
+    fn recv_mode(&mut self) -> RecvMode {
+        RecvMode::BufferedUpfront(0)
+    }
+    fn data_received(&mut self, data: &[u8], end: bool)
+        -> Result<Async<usize>, Error>
+    {
+        assert!(end);
+        assert!(data.len() == 0);
+        Ok(Async::Ready(0))
+    }
+    fn start_response(&mut self, mut e: Encoder<S>) -> ResponseFuture<S> {
+
+        let strprefix = from_utf8(self.prefix.as_os_str().as_bytes())
+            .expect("prefix is valid utf8");
+
+        let page = PAGE
+            .replace("{prefix}", strprefix)
+            .replace("{code}", &format!("{:03}", self.status.code()))
+            .replace("{reason}", self.status.reason());
+
+        e.status(self.status);
+        e.add_length(page.as_bytes().len() as u64).unwrap();
+
+        e.format_header("Date", time::now_utc().rfc822()).unwrap();
+        e.add_header("Content-Type", "text/html; charset=utf-8").unwrap();
+        e.add_header("Server",
+            concat!("httpbin-rs/", env!("CARGO_PKG_VERSION"))
+        ).unwrap();
+
+        if e.done_headers().unwrap() {
+            e.write_body(page.as_bytes());
+        }
+        Box::new(ok(e.done()))
+    }
+}
+
+pub fn serve<S: Io + 'static>(req: Request) -> Response<S> {
+    let parsed = from_utf8(req.suffix().as_os_str().as_bytes()).ok()
+        .and_then(|s| u16::from_str(s).ok())
+        .and_then(|x| Status::from(x));
     let status = match parsed {
         Some(status) => status,
         None => Status::BadRequest,
     };
-    ResponseFn::new(move |mut res| {
-        res.status(status);
-        let page = PAGE
-            .replace("{prefix}", "")
-            .replace("{code}", &format!("{:03}", status.code()))
-            .replace("{reason}", status.reason());
-        res.add_length(page.as_bytes().len() as u64).unwrap();
-        std_headers(&mut res);
-        if res.done_headers().unwrap() {
-            res.write_body(page.as_bytes());
-        }
-        res.done()
-    })
+    Box::new(CustomStatus { status: status, prefix: req.prefix().clone() })
 }

@@ -1,56 +1,113 @@
 use std::str::from_utf8;
-use std::marker::PhantomData;
-use std::path::Path;
+use std::path::{PathBuf, Path};
+use std::sync::Arc;
+use std::net::{SocketAddr, IpAddr};
 use std::os::unix::prelude::*;
 
-use futures::{Finished, finished};
+use httparse::Header;
 use tokio_core::io::Io;
-use tokio_service::Service;
-use tk_bufstream::IoBuf;
 
 use pages;
-use minihttp::server::{ResponseFn, Error, Request};
+use minihttp::server::{Dispatcher, Error, Head};
+use pages::{Response};
 
-pub struct HttpBin<S> {
-    p: PhantomData<S>
+pub struct HttpBin {
+    prefix: Arc<PathBuf>,
 }
 
+pub struct HttpBinDispatcher {
+    addr: SocketAddr,
+    prefix: Arc<PathBuf>,
+}
 
-impl<S: Io> Service for HttpBin<S> {
-    type Request = Request;
-    type Response = ResponseFn<Finished<IoBuf<S>, Error>, S>;
-    type Error = Error;
-    type Future = Finished<Self::Response, Error>;
+pub struct Request<'a> {
+    addr: SocketAddr,
+    head: &'a Head<'a>,
+    prefix: &'a Arc<PathBuf>,
+    suffix: &'a Path,
+}
 
-    fn call(&self, req: Self::Request) -> Self::Future {
-        let mut path = Path::new(&req.path).iter()
-            .map(|x| from_utf8(x.as_bytes()).unwrap());
-        path.next();  // first empty component
-        let serializer = match (path.next().unwrap_or(""), path.next()) {
-            ("", _) => pages::index::serve(),
-            ("ip", None) => pages::ip::serve(req.peer_addr),
-            ("user-agent", None) => pages::user_agent::serve(&req),
-            ("headers", None) => pages::headers::serve(&req),
-            ("encoding", Some("utf-8")) => pages::utf8::serve(),
-            ("status", Some(x)) => pages::status::serve(x),
-            _ => pages::not_found::serve(),
+impl<S: Io + 'static> Dispatcher<S> for HttpBinDispatcher {
+    type Codec = Response<S>;
+
+    fn headers_received(&mut self, headers: &Head)
+        -> Result<Self::Codec, Error>
+    {
+        let path = headers.path()
+            .and_then(|p| Path::new(p).strip_prefix(&*self.prefix).ok());
+        let path = match path {
+            Some(p) => p,
+            None => {
+                return Ok(pages::not_found::serve(Request {
+                    addr: self.addr,
+                    head: headers,
+                    prefix: &self.prefix,
+                    suffix: Path::new("--not_found--"),
+                }));
+            }
         };
-        return finished(serializer)
-    }
-}
-
-impl<S: Io> HttpBin<S> {
-    pub fn new() -> HttpBin<S> {
-        HttpBin {
-            p: PhantomData,
+        let mut path_iter = Path::new(&path).iter();
+        let first_part = path_iter.next()
+            .and_then(|x| from_utf8(x.as_bytes()).ok())
+            .unwrap_or("");
+        let req = Request {
+            addr: self.addr,
+            head: headers,
+            prefix: &self.prefix,
+            suffix: path_iter.as_path(),
+        };
+        match first_part {
+            "" => Ok(pages::index::serve(req)),
+            "ip" => Ok(pages::ip::serve(req)),
+            "user-agent" => Ok(pages::user_agent::serve(req)),
+            "headers" => Ok(pages::headers::serve(req)),
+            "encoding" => Ok(pages::utf8::serve(req)),
+            "status" => Ok(pages::status::serve(req)),
+            _ => Ok(pages::not_found::serve(req)),
         }
     }
 }
 
-impl<S: Io> Clone for HttpBin<S> {
-    fn clone(&self) -> HttpBin<S> {
+impl HttpBin {
+    /// Create a HttpBin instance at root of the domain
+    pub fn new() -> HttpBin {
         HttpBin {
-            p: self.p,
+            prefix: Arc::new(PathBuf::from("/")),
         }
+    }
+
+    /// Create a HttpBin instance at specified path
+    ///
+    /// The path influences both: how path is matched (everything that does
+    /// not start with prefix returns 404). And all paths rendered in the
+    /// page.
+    pub fn new_at(path: &Path) -> HttpBin {
+        assert!(path.is_absolute());
+        HttpBin {
+            prefix: Arc::new(path.to_path_buf()),
+        }
+    }
+
+    /// Create an instance of HttpBinDispatcher
+    pub fn instantiate(&self, addr: SocketAddr) -> HttpBinDispatcher {
+        HttpBinDispatcher {
+            addr: addr,
+            prefix: self.prefix.clone()
+        }
+    }
+}
+
+impl<'a> Request<'a> {
+    pub fn prefix(&self) -> &Arc<PathBuf> {
+        self.prefix
+    }
+    pub fn ip(&self) -> IpAddr {
+        self.addr.ip()
+    }
+    pub fn headers(&self) -> ::std::slice::Iter<Header> {
+        self.head.headers().iter()
+    }
+    pub fn suffix(&self) -> &Path {
+        self.suffix
     }
 }

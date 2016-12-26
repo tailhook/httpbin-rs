@@ -1,19 +1,20 @@
-use futures::{Finished};
-use tk_bufstream::IoBuf;
+use std::str::from_utf8;
+use std::ascii::AsciiExt;
+
 use tokio_core::io::Io;
-use minihttp::server::{ResponseFn, Error, Request};
 use serde_json::builder::ObjectBuilder;
 
-use super::json_page;
+use pages::{Response};
+use service::{Request};
 
-pub fn serve<S: Io>(request: &Request)
-    -> ResponseFn<Finished<IoBuf<S>, Error>, S>
-{
-    let ua = request.headers.iter()
-        .find(|h| &h.0 == "User-Agent")
-        .map(|h| &h.1[..])
+
+pub fn serve<S: Io + 'static>(req: Request) -> Response<S> {
+    let ua = req.headers()
+        .find(|h| h.name.eq_ignore_ascii_case("User-Agent"))
+        .map(|h| &h.value[..])
+        .map(|v| from_utf8(v).unwrap_or("--<<Invalid Utf8>>--"))
         .unwrap_or("");
-    json_page(&ObjectBuilder::new()
+    req.json(ObjectBuilder::new()
         .insert("user_agent", ua)
         .build())
 }
