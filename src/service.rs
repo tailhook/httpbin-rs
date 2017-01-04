@@ -105,7 +105,7 @@ impl<'a> Request<'a> {
         self.addr.ip()
     }
     pub fn headers(&self) -> ::std::slice::Iter<Header> {
-        self.head.headers().iter()
+        self.head.all_headers().iter()
     }
     pub fn suffix(&self) -> &Path {
         self.suffix
