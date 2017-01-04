@@ -8,7 +8,7 @@ use httparse::Header;
 use tokio_core::io::Io;
 
 use pages;
-use minihttp::server::{Dispatcher, Error, Head};
+use minihttp::server::{Dispatcher, Error, Head, HeaderIter};
 use pages::{Response};
 
 pub struct HttpBin {
@@ -61,6 +61,7 @@ impl<S: Io + 'static> Dispatcher<S> for HttpBinDispatcher {
             "ip" => Ok(pages::ip::serve(req)),
             "user-agent" => Ok(pages::user_agent::serve(req)),
             "headers" => Ok(pages::headers::serve(req)),
+            "stripped-headers" => Ok(pages::headers::serve_stripped(req)),
             "encoding" => Ok(pages::utf8::serve(req)),
             "status" => Ok(pages::status::serve(req)),
             _ => Ok(pages::not_found::serve(req)),
@@ -106,6 +107,9 @@ impl<'a> Request<'a> {
     }
     pub fn headers(&self) -> ::std::slice::Iter<Header> {
         self.head.all_headers().iter()
+    }
+    pub fn stripped_headers(&self) -> HeaderIter {
+        self.head.headers()
     }
     pub fn suffix(&self) -> &Path {
         self.suffix
