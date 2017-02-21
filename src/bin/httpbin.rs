@@ -30,11 +30,12 @@ fn main() {
     let listener = TcpListener::bind(&addr, &lp.handle()).unwrap();
     let cfg = Config::new().done();
     let bin = HttpBin::new();
+    let h1 = lp.handle();
 
     let done = listener.incoming()
         .map_err(|e| { println!("Accept error: {}", e); })
         .map(move |(socket, addr)| {
-            Proto::new(socket, &cfg, bin.instantiate(addr))
+            Proto::new(socket, &cfg, bin.instantiate(addr), &h1)
             .map_err(|e| { println!("Connection error: {}", e); })
         })
         .buffer_unordered(200000)

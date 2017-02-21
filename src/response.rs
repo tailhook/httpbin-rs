@@ -29,7 +29,7 @@ impl<S: Io + 'static> Codec<S> for Html {
     type ResponseFuture = ResponseFuture<S>;
 
     fn recv_mode(&mut self) -> RecvMode {
-        RecvMode::BufferedUpfront(0)
+        RecvMode::buffered_upfront(0)
     }
     fn data_received(&mut self, data: &[u8], end: bool)
         -> Result<Async<usize>, Error>
@@ -71,7 +71,7 @@ impl<S: Io + 'static> Codec<S> for Json {
     type ResponseFuture = ResponseFuture<S>;
 
     fn recv_mode(&mut self) -> RecvMode {
-        RecvMode::BufferedUpfront(0)
+        RecvMode::buffered_upfront(0)
     }
     fn data_received(&mut self, data: &[u8], end: bool)
         -> Result<Async<usize>, Error>
