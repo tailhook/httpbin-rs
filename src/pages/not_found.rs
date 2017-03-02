@@ -1,4 +1,4 @@
-use minihttp::Status;
+use tk_http::Status;
 use tokio_core::io::Io;
 
 use pages::{Response};

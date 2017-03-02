@@ -3,7 +3,7 @@ extern crate tokio_core;
 extern crate futures;
 extern crate tk_bufstream;
 extern crate netbuf;
-extern crate minihttp;
+extern crate tk_http;
 extern crate httpbin;
 #[macro_use] extern crate log;
 extern crate env_logger;
@@ -15,7 +15,7 @@ use tokio_core::net::{TcpListener};
 use futures::{Stream, Future};
 
 use httpbin::HttpBin;
-use minihttp::server::{Config, Proto};
+use tk_http::server::{Config, Proto};
 
 
 fn main() {

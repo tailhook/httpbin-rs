@@ -5,8 +5,8 @@ use std::os::unix::ffi::OsStrExt;
 
 use time;
 use tokio_core::io::Io;
-use minihttp::Status;
-use minihttp::server::{Codec, Error, Encoder, RecvMode};
+use tk_http::Status;
+use tk_http::server::{Codec, Error, Encoder, RecvMode};
 use futures::{Async};
 use futures::future::{ok};
 

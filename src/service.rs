@@ -8,7 +8,7 @@ use httparse::Header;
 use tokio_core::io::Io;
 
 use pages;
-use minihttp::server::{Dispatcher, Error, Head, HeaderIter};
+use tk_http::server::{Dispatcher, Error, Head, HeaderIter};
 use pages::{Response};
 
 pub struct HttpBin {

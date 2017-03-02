@@ -6,8 +6,8 @@ use time;
 use futures::future::{ok};
 use futures::{Async};
 use tokio_core::io::Io;
-use minihttp::Status;
-use minihttp::server::{Codec, Error, Encoder, RecvMode};
+use tk_http::Status;
+use tk_http::server::{Codec, Error, Encoder, RecvMode};
 use serde_json::{Value, to_vec_pretty};
 
 use pages::{ResponseFuture, Response};

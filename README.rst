@@ -12,7 +12,7 @@ This is a reimplementation of httpbin_ for two purposes:
 (not affiliated to the original httpbin)
 
 
-.. _http: http://github.com/popravich/minihttp
+.. _http: http://github.com/swindon-rs/tk-http
 .. _httpbin: http://httpbin.org
 
 License
