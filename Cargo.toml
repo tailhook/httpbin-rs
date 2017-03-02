@@ -6,7 +6,12 @@ description = """
 """
 license = "MIT/Apache-2.0"
 readme = "README.rst"
-keywords = ["tokio", "http", "httpbin"]
+keywords = ["tokio", "http", "httpbin", "command-line"]
+categories = [
+    "asynchronous",
+    "network-programming",
+    "command-line-utilities",
+    ]
 homepage = "http://github.com/tailhook/httpbin-rs"
 documentation = "http://docs.rs/httpbin-rs"
 version = "0.1.0"
