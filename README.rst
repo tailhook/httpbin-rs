@@ -11,6 +11,11 @@ This is a reimplementation of httpbin_ for two purposes:
 
 (not affiliated to the original httpbin)
 
+Installation (of the binary)::
+
+    cargo install httpbin
+
+Or use it as a library
 
 .. _http: http://github.com/swindon-rs/tk-http
 .. _httpbin: http://httpbin.org
