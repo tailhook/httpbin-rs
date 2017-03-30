@@ -6,7 +6,6 @@ extern crate netbuf;
 extern crate tk_http;
 extern crate tk_listen;
 extern crate httpbin;
-#[macro_use] extern crate log;
 extern crate env_logger;
 
 use std::env;
