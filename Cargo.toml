@@ -22,13 +22,13 @@ futures = "0.1.2"
 quick-error = "1.1.0"
 tokio-core = "0.1.6"
 tokio-io = "0.1.0"
-netbuf = "0.3.5"
+netbuf = "0.4.0"
 argparse = "0.2.1"
 env_logger = "0.3.5"
 time = "0.1.0"
 log = "0.3.6"
-tk-bufstream = { git="https://github.com/tailhook/tk-bufstream", rev="4186137"}
-tk-http = { git="https://github.com/swindon-rs/tk-http", rev="9c540d3" }
+tk-bufstream = "0.3.0"
+tk-http = "0.2.0"
 serde_json = "0.8.3"
 httparse = "1.2.1"
 
