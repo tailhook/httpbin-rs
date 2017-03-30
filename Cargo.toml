@@ -29,6 +29,7 @@ time = "0.1.0"
 log = "0.3.6"
 tk-bufstream = "0.3.0"
 tk-http = "0.2.0"
+tk-listen = "0.1.0"
 serde_json = "0.8.3"
 httparse = "1.2.1"
 

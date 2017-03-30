@@ -1,8 +1,6 @@
-use std::str::from_utf8;
 use std::path::{PathBuf, Path};
 use std::sync::Arc;
 use std::net::{SocketAddr, IpAddr};
-use std::os::unix::prelude::*;
 
 use httparse::Header;
 
@@ -47,7 +45,7 @@ impl<S: 'static> Dispatcher<S> for HttpBinDispatcher {
         };
         let mut path_iter = Path::new(&path).iter();
         let first_part = path_iter.next()
-            .and_then(|x| from_utf8(x.as_bytes()).ok())
+            .and_then(|x| x.to_str())
             .unwrap_or("");
         let req = Request {
             addr: self.addr,

@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::os::unix::ffi::OsStrExt;
 
 use time;
 use futures::future::{ok};
@@ -39,9 +38,9 @@ impl<S: 'static> Codec<S> for Html {
     }
     fn start_response(&mut self, mut e: Encoder<S>) -> ResponseFuture<S> {
 
-        let mut strprefix = self.prefix.as_os_str().as_bytes();
-        if strprefix == b"/" {
-            strprefix = b"";
+        let mut strprefix = self.prefix.to_str().unwrap_or("");
+        if strprefix == "/" {
+            strprefix = "";
         }
         let nprefixes = self.data.split("{prefix}").count() - 1;
         let blen = self.data.len() +
@@ -58,7 +57,7 @@ impl<S: 'static> Codec<S> for Html {
             let mut iter = self.data.split("{prefix}");
             e.write_body(iter.next().unwrap().as_bytes());
             for chunk in iter {
-                e.write_body(strprefix);
+                e.write_body(strprefix.as_bytes());
                 e.write_body(chunk.as_bytes());
             }
         }

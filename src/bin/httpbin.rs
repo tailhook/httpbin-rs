@@ -4,11 +4,13 @@ extern crate futures;
 extern crate tk_bufstream;
 extern crate netbuf;
 extern crate tk_http;
+extern crate tk_listen;
 extern crate httpbin;
 #[macro_use] extern crate log;
 extern crate env_logger;
 
 use std::env;
+use std::time::Duration;
 
 use tokio_core::reactor::Core;
 use tokio_core::net::{TcpListener};
@@ -16,6 +18,7 @@ use futures::{Stream, Future};
 
 use httpbin::HttpBin;
 use tk_http::server::{Config, Proto};
+use tk_listen::ListenExt;
 
 
 fn main() {
@@ -33,13 +36,12 @@ fn main() {
     let h1 = lp.handle();
 
     let done = listener.incoming()
-        .map_err(|e| { println!("Accept error: {}", e); })
+        .sleep_on_error(Duration::from_millis(100), &h1)
         .map(move |(socket, addr)| {
             Proto::new(socket, &cfg, bin.instantiate(addr), &h1)
             .map_err(|e| { println!("Connection error: {}", e); })
         })
-        .buffer_unordered(200000)
-          .for_each(|()| Ok(()));
+        .listen(1000);
 
     lp.run(done).unwrap();
 }

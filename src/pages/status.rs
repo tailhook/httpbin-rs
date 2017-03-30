@@ -1,7 +1,6 @@
-use std::str::{FromStr, from_utf8};
+use std::str::{FromStr};
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::os::unix::ffi::OsStrExt;
 
 use time;
 use tk_http::Status;
@@ -34,7 +33,7 @@ impl<S: 'static> Codec<S> for CustomStatus {
     }
     fn start_response(&mut self, mut e: Encoder<S>) -> ResponseFuture<S> {
 
-        let strprefix = from_utf8(self.prefix.as_os_str().as_bytes())
+        let strprefix = self.prefix.as_os_str().to_str()
             .expect("prefix is valid utf8");
 
         let page = PAGE
@@ -59,7 +58,7 @@ impl<S: 'static> Codec<S> for CustomStatus {
 }
 
 pub fn serve<S: 'static>(req: Request) -> Response<S> {
-    let parsed = from_utf8(req.suffix().as_os_str().as_bytes()).ok()
+    let parsed = req.suffix().to_str()
         .and_then(|s| u16::from_str(s).ok())
         .and_then(|x| Status::from(x));
     let status = match parsed {
