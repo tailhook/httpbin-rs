@@ -5,7 +5,6 @@ use std::net::{SocketAddr, IpAddr};
 use std::os::unix::prelude::*;
 
 use httparse::Header;
-use tokio_core::io::Io;
 
 use pages;
 use tk_http::server::{Dispatcher, Error, Head, HeaderIter};
@@ -27,7 +26,7 @@ pub struct Request<'a> {
     suffix: &'a Path,
 }
 
-impl<S: Io + 'static> Dispatcher<S> for HttpBinDispatcher {
+impl<S: 'static> Dispatcher<S> for HttpBinDispatcher {
     type Codec = Response<S>;
 
     fn headers_received(&mut self, headers: &Head)

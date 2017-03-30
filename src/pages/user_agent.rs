@@ -1,14 +1,13 @@
 use std::str::from_utf8;
 use std::ascii::AsciiExt;
 
-use tokio_core::io::Io;
 use serde_json::builder::ObjectBuilder;
 
 use pages::{Response};
 use service::{Request};
 
 
-pub fn serve<S: Io + 'static>(req: Request) -> Response<S> {
+pub fn serve<S: 'static>(req: Request) -> Response<S> {
     let ua = req.headers()
         .find(|h| h.name.eq_ignore_ascii_case("User-Agent"))
         .map(|h| &h.value[..])

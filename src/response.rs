@@ -5,7 +5,6 @@ use std::os::unix::ffi::OsStrExt;
 use time;
 use futures::future::{ok};
 use futures::{Async};
-use tokio_core::io::Io;
 use tk_http::Status;
 use tk_http::server::{Codec, Error, Encoder, RecvMode};
 use serde_json::{Value, to_vec_pretty};
@@ -25,7 +24,7 @@ pub struct Json {
 }
 
 
-impl<S: Io + 'static> Codec<S> for Html {
+impl<S: 'static> Codec<S> for Html {
     type ResponseFuture = ResponseFuture<S>;
 
     fn recv_mode(&mut self) -> RecvMode {
@@ -67,7 +66,7 @@ impl<S: Io + 'static> Codec<S> for Html {
     }
 }
 
-impl<S: Io + 'static> Codec<S> for Json {
+impl<S: 'static> Codec<S> for Json {
     type ResponseFuture = ResponseFuture<S>;
 
     fn recv_mode(&mut self) -> RecvMode {
@@ -98,14 +97,14 @@ impl<S: Io + 'static> Codec<S> for Json {
 }
 
 impl<'a> Request<'a> {
-    pub fn html<S: Io + 'static>(&self, data: &'static str) -> Response<S> {
+    pub fn html<S: 'static>(&self, data: &'static str) -> Response<S> {
         Box::new(Html {
             status: Status::Ok,
             prefix: self.prefix().clone(),
             data: data,
         })
     }
-    pub fn html_error<S: Io + 'static>(&self, status: Status,
+    pub fn html_error<S: 'static>(&self, status: Status,
         data: &'static str)
         -> Response<S>
     {
@@ -115,7 +114,7 @@ impl<'a> Request<'a> {
             data: data,
         })
     }
-    pub fn json<S: Io + 'static>(&self, val: Value) -> Response<S> {
+    pub fn json<S: 'static>(&self, val: Value) -> Response<S> {
         Box::new(Json {
             data: val,
         })

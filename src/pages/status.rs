@@ -4,7 +4,6 @@ use std::sync::Arc;
 use std::os::unix::ffi::OsStrExt;
 
 use time;
-use tokio_core::io::Io;
 use tk_http::Status;
 use tk_http::server::{Codec, Error, Encoder, RecvMode};
 use futures::{Async};
@@ -20,7 +19,7 @@ pub struct CustomStatus {
     prefix: Arc<PathBuf>,
 }
 
-impl<S: Io + 'static> Codec<S> for CustomStatus {
+impl<S: 'static> Codec<S> for CustomStatus {
     type ResponseFuture = ResponseFuture<S>;
 
     fn recv_mode(&mut self) -> RecvMode {
@@ -59,7 +58,7 @@ impl<S: Io + 'static> Codec<S> for CustomStatus {
     }
 }
 
-pub fn serve<S: Io + 'static>(req: Request) -> Response<S> {
+pub fn serve<S: 'static>(req: Request) -> Response<S> {
     let parsed = from_utf8(req.suffix().as_os_str().as_bytes()).ok()
         .and_then(|s| u16::from_str(s).ok())
         .and_then(|x| Status::from(x));

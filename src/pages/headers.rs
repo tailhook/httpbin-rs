@@ -2,13 +2,12 @@ use std::str::from_utf8;
 use std::ascii::AsciiExt;
 use std::collections::HashMap;
 
-use tokio_core::io::Io;
 use serde_json::builder::ObjectBuilder;
 
 use pages::{Response};
 use service::{Request};
 
-pub fn serve<S: Io + 'static>(req: Request) -> Response<S> {
+pub fn serve<S: 'static>(req: Request) -> Response<S> {
     req.json(ObjectBuilder::new()
         .insert_object("headers", |mut ob| {
             // emulate case-insensitive dict by using lowercase keys
@@ -39,7 +38,7 @@ pub fn serve<S: Io + 'static>(req: Request) -> Response<S> {
         .build())
 }
 
-pub fn serve_stripped<S: Io + 'static>(req: Request) -> Response<S> {
+pub fn serve_stripped<S: 'static>(req: Request) -> Response<S> {
     req.json(ObjectBuilder::new()
         .insert_object("headers", |mut ob| {
             // emulate case-insensitive dict by using lowercase keys
