@@ -30,7 +30,7 @@ log = "0.3.6"
 tk-bufstream = "0.3.0"
 tk-http = "0.3.0"
 tk-listen = "0.1.0"
-serde_json = "0.8.3"
+serde_json = "1.0.0"
 httparse = "1.2.1"
 
 [lib]
