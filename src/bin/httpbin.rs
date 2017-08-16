@@ -1,8 +1,5 @@
-extern crate time;
 extern crate tokio_core;
 extern crate futures;
-extern crate tk_bufstream;
-extern crate netbuf;
 extern crate tk_http;
 extern crate tk_listen;
 extern crate httpbin;

@@ -8,11 +8,12 @@ use pages;
 use tk_http::server::{Dispatcher, Error, Head, HeaderIter};
 use pages::{Response};
 
-//! A factory for creating http dispatchers
+/// A factory for creating http dispatchers
 pub struct HttpBin {
     prefix: Arc<PathBuf>,
 }
 
+/// Instantiated dispatcher for http bin
 pub struct HttpBinDispatcher {
     addr: SocketAddr,
     prefix: Arc<PathBuf>,

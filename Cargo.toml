@@ -38,3 +38,4 @@ name = "httpbin"
 
 [[bin]]
 name = "httpbin"
+doc = false
