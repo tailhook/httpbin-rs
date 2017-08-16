@@ -1,0 +1,57 @@
+language: rust
+rust: stable
+os: linux
+dist: trusty
+sudo: false
+addons:
+  apt:
+    packages:
+    - fakeroot
+    - musl-tools
+
+cache:
+- apt
+- cargo
+
+before_cache:
+- rm -r $TRAVIS_BUILD_DIR/target/debug
+
+script:
+- cargo build $CARGO_ARGS
+- cargo test $CARGO_ARGS
+
+jobs:
+  include:
+  - rust: stable
+  - rust: beta
+  - rust: nightly
+
+  # deploy
+  - stage: publish docs
+    env:
+    # CARGO_TOKEN
+    - secure: "lphBbBHsrQ2VSTycbkcgaRimYsRk/kBLvXZMTtEepbrk+pAPffSiICf2oj40S0Oj92wZiNF7mImIS4Vr+xdGlJ1jPFGvvMi87IcNd3NsJt/1KcsIG05h/1/gwR/aJNc4f+Cn5x7QY9nV+X9k8AOcpfeducrUIy1AMdBj3Ahbyl82d4QbS6S96OJtoVK3/lT8al/BLAL5F7we4wvZgSNM1nw5i6lHOOhh4ohtfMgvPCIDpDh/xCmduX2pFuRxhc8Mnw9o1oNCWyKhT6PS0HtM5kSLLcCLCFVMkqYUScqluvVkp1vlwFLOa42SLfAiXPrKAWKRh0Yhlq1BoFCIJklAzMciP2qaZbeYIK1nV252Df71T4mvIDYOvt0abWodw1KtAWFTFLoDDzWJ7as2foitDwKPGWbwEw0FJTxwB72IG3Jhu9dnmXvkHbswNP650MFK1hP1MDODNMB/U2DwQ45Icv2xH4JFxin52ICeqZavhtceX3B3L2EPH5mFlPAeadRixKnG7ffIUET/Of1gHS/cafiJVMQWy/rM8fmGNKLQ7jylmXPLTZR3W63kQbd+1764VSN3KzuhhY2TYflYeAX07RX6mX5AifiXxlxzHUC+7qJ4//b5mh0LmtAuXdQ1gI8ZhT7yftbZk35DA1Ls9vTmk71XS5IPCzjmqVnrHA8P7ss="
+    install: true
+    script: true
+
+    before_deploy: |
+      mkdir -p dist
+      rustup target add x86_64-unknown-linux-musl
+      cargo build --target=x86_64-unknown-linux-musl --release
+      fakeroot sh -ecx '
+        install -D target/x86_64-unknown-linux-musl/release/httpbin pkg/usr/bin/httpbin
+        tar -C pkg -czf dist/httpbin-static-$TRAVIS_TAG.tar.gz usr
+      '
+
+    deploy:
+    - provider: script
+      script: 'cargo publish --verbose --token=$CARGO_TOKEN'
+      on:
+        tags: true
+    - provider: releases
+      api_key:
+        secure: "MhTAu5eXpFjHS/lSgkkzAfv8NRhrQqiwDRMLnR9ccnHiM7RvIt5IFNvUTIZAU+3VasnoC9ptVwpve1sLa8qDGKA5wqpOWBOzzDTh/m8IJqgXTWet+2Tn8c3cZGPzDaOn0a6KSsE2DsrAdcAjWI84nS79WA50Ee0/YWWD7Jo7FBzikHIQ42ZTvbcMpD59nruaov7EMYulHpaAxi/rSUdtttfcsTJAzlNZ40NsEi1wsh5c33lxejJsr5+xBPA+5wG0v8pd0cnxJDiK2dcZsbaq5GKOcgPto/xgAIBimjdZIiQCqd+IgGIHzI5/sHCDGpsI0Vbfho4dX3a4xpDmS7wBDTRr3IWKpY/M2rGFjZZHgr4MfiUkaQj33m8ed8n3ntnCDkZek8KCWxnBSFgGb3YLt8iB0E0UEFxJepnBTcKpc5G9jhUwOm5bs4OuG/NeSjVZT02/dbvbFx6kWQ4PVnN6TTPupKYK0ptQjGvHjFlRuWigPfjCVHmF3IcJhda1QEaPDJZH9FJ0uotR4F3IVG6G2OBLRPcVRvmx2cQ/zFoGeN1PG21ALTAEQJnyjGE1WUXF3XeXBleoO4SUTCkH5L7zCRkWrgrN3GAeE+ckIoQYwvjR7irSGMW8y7DZKvvBl2OzmnnnzVDEniPYzqGpmIEwW+PiLaw8YKBLFAwlEzCAM/0="
+      file: "dist/httpbin-static-$TRAVIS_TAG.tar.gz"
+      skip_cleanup: true
+      on:
+        tags: true
