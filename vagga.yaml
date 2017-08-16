@@ -20,6 +20,11 @@ commands:
     container: ubuntu
     run: [cargo, test]
 
+  _bulk: !Command
+    description: Run `bulk` command (for version bookkeeping)
+    container: ubuntu
+    run: [bulk]
+
 containers:
 
   ubuntu:
