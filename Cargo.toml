@@ -14,7 +14,7 @@ categories = [
     ]
 homepage = "http://github.com/tailhook/httpbin-rs"
 documentation = "http://docs.rs/httpbin-rs"
-version = "0.3.2"
+version = "0.3.3"
 authors = ["paul@colomiets.name"]
 
 [dependencies]
