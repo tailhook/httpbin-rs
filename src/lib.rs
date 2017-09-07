@@ -43,12 +43,12 @@
 //! ```
 //!
 #![warn(missing_docs)]
-extern crate time;
 extern crate futures;
-extern crate tokio_core;
+extern crate httparse;
+extern crate httpdate;
 extern crate tk_bufstream;
 extern crate tk_http;
-extern crate httparse;
+extern crate tokio_core;
 #[macro_use] extern crate serde_json;
 
 mod service;

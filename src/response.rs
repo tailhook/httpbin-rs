@@ -1,12 +1,13 @@
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::SystemTime;
 
-use time;
 use futures::future::{ok};
 use futures::{Async};
+use httpdate::HttpDate;
+use serde_json::{Value, to_vec_pretty};
 use tk_http::Status;
 use tk_http::server::{Codec, Error, Encoder, RecvMode};
-use serde_json::{Value, to_vec_pretty};
 
 use pages::{ResponseFuture, Response};
 use service::{Request};
@@ -48,7 +49,7 @@ impl<S: 'static> Codec<S> for Html {
 
         e.status(self.status);
         e.add_length(blen as u64).unwrap();
-        e.format_header("Date", time::now_utc().rfc822()).unwrap();
+        e.format_header("Date", &HttpDate::from(SystemTime::now())).unwrap();
         e.add_header("Content-Type", "text/html; charset=utf-8").unwrap();
         e.add_header("Server",
             concat!("httpbin-rs/", env!("CARGO_PKG_VERSION"))
@@ -83,7 +84,7 @@ impl<S: 'static> Codec<S> for Json {
             .expect("json serialization always work");
         e.status(Status::Ok);
         e.add_length(data.len() as u64).unwrap();
-        e.format_header("Date", time::now_utc().rfc822()).unwrap();
+        e.format_header("Date", &HttpDate::from(SystemTime::now())).unwrap();
         e.add_header("Content-Type", "application/json").unwrap();
         e.add_header("Server",
             concat!("httpbin-rs/", env!("CARGO_PKG_VERSION"))

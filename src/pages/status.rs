@@ -1,8 +1,9 @@
 use std::str::{FromStr};
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::SystemTime;
 
-use time;
+use httpdate::HttpDate;
 use tk_http::Status;
 use tk_http::server::{Codec, Error, Encoder, RecvMode};
 use futures::{Async};
@@ -44,7 +45,7 @@ impl<S: 'static> Codec<S> for CustomStatus {
         e.status(self.status);
         e.add_length(page.as_bytes().len() as u64).unwrap();
 
-        e.format_header("Date", time::now_utc().rfc822()).unwrap();
+        e.format_header("Date", HttpDate::from(SystemTime::now())).unwrap();
         e.add_header("Content-Type", "text/html; charset=utf-8").unwrap();
         e.add_header("Server",
             concat!("httpbin-rs/", env!("CARGO_PKG_VERSION"))
