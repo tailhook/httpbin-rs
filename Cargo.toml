@@ -25,7 +25,7 @@ tokio-io = "0.1.0"
 netbuf = "0.4.0"
 argparse = "0.2.1"
 env_logger = "0.3.5"
-httpdate = "0.3.0"
+httpdate = "0.3.2"
 log = "0.3.6"
 tk-bufstream = "0.3.0"
 tk-http = { version="0.3.1", default-features=false }
